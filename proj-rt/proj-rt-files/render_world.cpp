@@ -22,8 +22,23 @@ Render_World::~Render_World()
 // to ensure that hit.dist>=small_t.
 Hit Render_World::Closest_Intersection(const Ray& ray)
 {
-    TODO;
-    return {};
+    //TODO;
+	
+	//min_t = yuge number;
+	int min_t = std::numeric_limits<int>::max();
+	Hit temp, closest_hit;
+	closest_hit.dist = min_t;
+	for (unsigned int i = 0; i < Objects.size(); ++i) {
+		temp = Objects.at(i)->Intersect(ray, -1);
+		if (temp.dist < closest_hit.dist && temp.dist > small_t) {
+			closest_hit = temp;
+		}
+	}
+	//not sure if this entire function is correct yet, come back later
+	
+	return closest_hit;
+
+	//    return {};
 }
 
 // set up the initial view ray and call
