@@ -24,12 +24,12 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
 {
     //TODO;
 	
-	//min_t = yuge number;
+	//min_t = large number;
 	int min_t = std::numeric_limits<int>::max();
 	Hit temp, closest_hit;
 	closest_hit.dist = min_t;
-	for (unsigned int i = 0; i < Objects.size(); ++i) {
-		temp = Objects.at(i)->Intersect(ray, -1);
+	for (unsigned int i = 0; i < objects.size(); ++i) {
+		temp = objects.at(i)->Intersect(ray, -1);
 		if (temp.dist < closest_hit.dist && temp.dist > small_t) {
 			closest_hit = temp;
 		}
@@ -72,7 +72,12 @@ void Render_World::Render()
 vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 {
     vec3 color;
-    TODO; // determine the color here
+    
+	//TODO; // determine the color here
+	Hit closest_hit = Closest_Intersection(ray);
+	if (there is an intersection) {//LOL WHAT AM I DOING
+		//set color using object shade_surface 
+	}
     return color;
 }
 
