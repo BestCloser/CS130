@@ -92,7 +92,7 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 		//normal at the intersection point and recursion_depth. 
 		//You can get the intersection point using the ray object 
 		//and the normal using the object pointer inside the hit object.
-		std::cout << "DID I MAKE IT THROUGH\n";
+	//	std::cout << "DID I MAKE IT THROUGH\n";
 	}
 	else { //no intersection
 		color = this->background_shader->Shade_Surface(ray, ray.direction, ray.direction, recursion_depth); //FIX
