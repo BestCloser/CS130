@@ -7,7 +7,6 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
     //TODO;
 	vec3 v = ray.endpoint - center; //e - c
 	vec3 u = ray.direction;
-	Hit h;
 	
 	double a = dot(u, u);	//a = u^2
 	double b = 2*dot(v, u);	// b = 2(e - c)u 
