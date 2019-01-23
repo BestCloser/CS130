@@ -10,28 +10,23 @@ Hit Plane::Intersection(const Ray& ray, int part) const
 {
     //TODO;
 	double t;
-	Hit h;
 	
-	float denom = dot(ray.direction, normal);
+	vec3 v = x1 - ray.endpoint;
+	vec3 u = ray.direction;
+	
+	float denom = dot(u, normal);
+	t = dot(v, normal) / denom;
 	if (denom > small_t) {
-        vec3 v = x1 - ray.endpoint;		
-        t = dot(v, normal) / denom; 
+   		return {this, t, part};
 		
-		h.object = this;
-		h.dist = t;
-		h.part = part;
-		return h;	
-		//Hit = {
+        //Hit = {
 		//const Object* object; // object that was intersected
 		//double dist; // distance along ray to intersection location
 		//int part; // which part was intersected (eg, for meshes)
 		//}
 	}
 	else {
-		h.object = nullptr;
-		h.dist = 0;
-		h.part = 0;
-		return h;
+		return {nullptr, 0, part};
 	}
 	
 //    return {0,0,0};
