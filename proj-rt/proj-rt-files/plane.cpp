@@ -14,7 +14,7 @@ Hit Plane::Intersection(const Ray& ray, int part) const
 	
 	float denom = dot(ray.direction, normal);
 	if (denom > small_t) { 
-        Vec3 v = x1 - ray.endpoint;		
+        vec3 v = x1 - ray.endpoint;		
         t = dot(v, normal) / denom; 
 		
 		h.object = this;
