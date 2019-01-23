@@ -82,9 +82,9 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 	
 	if (closest_hit.dist != 0) {		//there is an intersection
 		
-		std::cout << "BEFORE NORMAL\n";
+	//	std::cout << "BEFORE NORMAL\n";
 		vec3 normal = closest_hit.object->Normal(int_pt, 0);
-		std::cout << "AFTER NORMAL\n";
+	//	std::cout << "AFTER NORMAL\n";
 		
 		
 		color = closest_hit.object->material_shader->Shade_Surface(ray, int_pt, normal, recursion_depth); //FIX
