@@ -20,11 +20,11 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
 		t0 = (-b + sqrt(det)) / (2*a);
 		t1 = (-b - sqrt(det)) / (2*a);
 	}
-	else if (det == 0) {
+/*	else if (det == 0) {
 		t0 = -b / (2*a);
 		t1 = 0;
 	}
-	else { //det < 0
+*/	else { //det < 0
 		t0 = 0;
 		t1 = 0;
 	}
@@ -42,12 +42,12 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
 			h.dist = 0;
 			h.part = 0;
 		}
-		else {
+/*		else {
 			h.object = this;
 			h.dist = t0;
 			h.part = part;
 		}
-	}
+*/	}
 	else { //t1 != 0 //2 intersections, FIXME
 		if (t1 < t0) {
 			h.object = this;
