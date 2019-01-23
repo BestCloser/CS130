@@ -9,11 +9,11 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
 	vec3 u = ray.direction;
 	Hit h;
 	
-	double a = dot(u, u);	//(e - c)
+	double a = dot(u, u);	//u^2
 	double b = 2*dot(v, u);	// 2(e - c)u 
-	double c = dot(v, v) - pow(radius, 2); // (x - c) dot (x - c) = r^2
+	double c = dot(v, v) - (radius*radius); // (e - c) dot (e - c) = r^2
 	
-	double det = pow(b, 2) - 4*a*c; //determinant
+	double det = b*b - 4*a*c; //determinant
 	double t0, t1;
 	
 	if (det > 0) {
@@ -68,6 +68,10 @@ vec3 Sphere::Normal(const vec3& point, int part) const
 {
     vec3 normal;
     TODO; // compute the normal direction
+	
+	normal = normalize(point - center);
+	
+	
     return normal;
 }
 
