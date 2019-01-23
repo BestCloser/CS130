@@ -35,7 +35,7 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
 		}
 	}
 	//not sure if this entire function is correct yet, come back later
-	
+	std::cout << "did i make it here then\n";
 	return closest_hit;
 
 	//    return {};
@@ -76,7 +76,11 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 	//TODO; // determine the color here
 	Hit closest_hit = Closest_Intersection(ray);
 	vec3 int_pt = ray.Point(closest_hit.dist);
-	std::cout << "did i even make it here\n";
+
+
+//	std::cout << "did i even make it here\n";
+
+
 	vec3 temp = {0, 0, 0};
 	
 	
