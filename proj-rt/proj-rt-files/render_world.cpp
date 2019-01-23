@@ -25,7 +25,7 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
     //TODO;
 	
 	//min_t = large number;
-	int min_t = std::numeric_limits<int>::max();
+	int min_t = std::numeric_limits<double>::max();
 	Hit closest_hit = {nullptr, 0, 0};
 	
 	//closest_hit.dist = min_t;
