@@ -29,7 +29,7 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
 	Hit temp, closest_hit;
 	closest_hit.dist = min_t;
 	for (unsigned int i = 0; i < objects.size(); ++i) {
-		temp = objects.at(i)->Intersect(ray, -1);
+		temp = objects.at(i)->Intersection(ray, -1);
 		if (temp.dist < closest_hit.dist && temp.dist > small_t) {
 			closest_hit = temp;
 		}
@@ -81,14 +81,14 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 	
 	
 	if (closest_hit.dist != 0) {		//there is an intersection
-		color = closest_hit->object->material_shader->Shade_Surface(ray, int_pt, closest_hit.object->Normal(int_pt, -1), recursion_depth); //FIX
+		color = closest_hit.object->material_shader->Shade_Surface(ray, int_pt, closest_hit.object->Normal(int_pt, -1), recursion_depth); //FIX
 		//Shade_Surface receives as parameters: ray, intersection point, 
 		//normal at the intersection point and recursion_depth. 
 		//You can get the intersection point using the ray object 
 		//and the normal using the object pointer inside the hit object.		
 	}
 	else { //no intersection
-		color = this->background_shader->Shade_Surface(ray, temp, temp, recursion_depth) //FIX
+		color = this->background_shader->Shade_Surface(ray, temp, temp, recursion_depth); //FIX
 	
 	}
     return color;
