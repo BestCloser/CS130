@@ -75,8 +75,18 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
     
 	//TODO; // determine the color here
 	Hit closest_hit = Closest_Intersection(ray);
-	if (there is an intersection) {//LOL WHAT AM I DOING
-		//set color using object shade_surface 
+	vec3 int_pt = ray.Point(closest_hit.dist);
+	
+	if (closest_hit.dist != 0) {		//there is an intersection
+		color = closest_hit->object->material_shader->Shade_Surface(ray, int_pt, closest_hit.object->Normal(int_pt, -1), recursion_depth) //FIX
+		//Shade_Surface receives as parameters: ray, intersection point, 
+		//normal at the intersection point and recursion_depth. 
+		//You can get the intersection point using the ray object 
+		//and the normal using the object pointer inside the hit object.		
+	}
+	else { //no intersection
+		color = this->background_shader->Shade_Surface(ray, 0, 0, recursion_depth) //FIX
+	
 	}
     return color;
 }
