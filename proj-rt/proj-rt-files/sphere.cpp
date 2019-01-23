@@ -7,14 +7,15 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
     //TODO;
 	vec3 v = ray.endpoint - center; //e - c
 	vec3 u = ray.direction;
-	Hit h;
+	Hit h = {0, 0, 0};
 	
 	double a = dot(u, u);	//(e - c)
-	double b = 2*dot(v,u);	// 2(e - c)u 
-	double c = dot(v, v) - pow(radius, 2); // (x - c)^2 = r^2
+	double b = 2*dot(v, u);	// 2(e - c)u 
+	double c = dot(v, v) - pow(radius, 2); // (x - c) dot (x - c) = r^2
 	
-	double det = pow(b,2) - 4*a*c; //determinant
-	double t0, t1;
+	double det = pow(b, 2) - 4*a*c; //determinant
+	double t0 = 0;
+	double t1 = 0;
 	
 	if (det > 0) {
 		t0 = (-b + sqrt(det)) / (2*a);

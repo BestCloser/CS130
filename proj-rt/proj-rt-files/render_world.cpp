@@ -28,7 +28,7 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
 	int min_t = std::numeric_limits<int>::max();
 	Hit temp, closest_hit;
 	closest_hit.dist = min_t;
-	for (unsigned int i = 0; i < objects.size(); ++i) {
+	for (int i = 0; i < objects.size(); ++i) {
 		temp = objects.at(i)->Intersection(ray, -1);
 		if (temp.dist < closest_hit.dist && temp.dist > small_t) {
 			closest_hit = temp;
@@ -77,7 +77,7 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 	Hit closest_hit = Closest_Intersection(ray);
 	vec3 int_pt = ray.Point(closest_hit.dist);
 	
-	vec3 temp;
+	vec3 temp = {0, 0, 0};
 	
 	
 	if (closest_hit.dist != 0) {		//there is an intersection
