@@ -25,12 +25,12 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
     //TODO;
 	
 	//min_t = large number;
-	int min_t = std::numeric_limits<double>::max();
+	double min_t = std::numeric_limits<double>::max();
 	Hit closest_hit = {nullptr, 0, 0};
 	
 	//closest_hit.dist = min_t;
 	for (unsigned int i = 0; i < objects.size(); ++i) {
-		Hit temp = objects.at(i)->Intersection(ray, 0);
+		Hit temp = objects.at(i)->Intersection(ray, -1);
 		if (temp.object && temp.dist < min_t && temp.dist > small_t) {
 			closest_hit = temp;
 			min_t = closest_hit.dist;
@@ -46,13 +46,13 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
 void Render_World::Render_Pixel(const ivec2& pixel_index)
 {
     //TODO; // set up the initial view ray here
-    vec3 end_point = camera.position;
-	vec3 direction = (camera.World_Position(pixel_index) - end_point).normalized();
+//  vec3 end_point = camera.position;
+//	vec3 direction = (camera.World_Position(pixel_index) - end_point).normalized();
 	
 	Ray ray;
 	
-	ray.endpoint = end_point;
-	ray.direction = direction;
+	ray.endpoint = camera.position;
+	ray.direction = (camera.World_Position(pixel_index) - ray.endpoint).normalized();
 	
     vec3 color=Cast_Ray(ray,1);
     camera.Set_Pixel(pixel_index,Pixel_Color(color));
@@ -76,14 +76,14 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
     
 	//TODO; // determine the color here
 	Hit closest_hit = Closest_Intersection(ray);
-	vec3 int_pt = ray.Point(closest_hit.dist);
+	vec3 int_pt, normal;
 
 	//vec3 temp;
 	
 	if (closest_hit.dist != 0) {		//there is an intersection
-		
+		int_pt = ray.Point(closest_hit.dist);
 	//	std::cout << "BEFORE NORMAL\n";
-		vec3 normal = closest_hit.object->Normal(int_pt, 0);
+		normal = closest_hit.object->Normal(int_pt, -1);
 	//	std::cout << "AFTER NORMAL\n";
 		
 		
