@@ -9,8 +9,8 @@
 Hit Plane::Intersection(const Ray& ray, int part) const
 {
     //TODO;
-	double t = 0;
-	Hit h = {0, 0, 0};
+	double t;
+	Hit h;
 	
 	float denom = dot(ray.direction, normal);
 	if (denom > small_t) { 

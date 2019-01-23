@@ -80,7 +80,7 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 //	std::cout << "did i even make it here\n";
 
 
-	vec3 temp = {0, 0, 0};
+	vec3 temp;
 	
 	
 	if (closest_hit.dist != 0) {		//there is an intersection
