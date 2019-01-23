@@ -39,7 +39,7 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
 	
 	if (t1 == 0) {
 		if (t0 == 0) {
-			h.object = NULL;
+			h.object = nullptr;
 			h.dist = -1;
 			h.part = part;
 		}

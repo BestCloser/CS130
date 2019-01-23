@@ -28,7 +28,7 @@ Hit Plane::Intersection(const Ray& ray, int part) const
 		//}
 	}
 	else {
-		h.object = NULL;
+		h.object = nullptr;
 		h.dist = -1;
 		h.part = part;
 		return h;
