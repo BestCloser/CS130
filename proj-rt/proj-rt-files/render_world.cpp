@@ -77,7 +77,7 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 	Hit closest_hit = Closest_Intersection(ray);
 	vec3 int_pt = ray.Point(closest_hit.dist);
 	
-	vec3 temp = {0, 0, 0};
+	vec3 temp;
 	
 	
 	if (closest_hit.dist != 0) {		//there is an intersection
