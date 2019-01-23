@@ -76,7 +76,7 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 	//TODO; // determine the color here
 	Hit closest_hit = Closest_Intersection(ray);
 	vec3 int_pt = ray.Point(closest_hit.dist);
-	
+	std::cout << "did i even make it here\n";
 	vec3 temp = {0, 0, 0};
 	
 	
