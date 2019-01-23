@@ -16,7 +16,7 @@ Hit Plane::Intersection(const Ray& ray, int part) const
 	
 //	float denom = dot(u, normal);
 	t = dot(v, normal) / dot(u, normal);
-	if (abs(dot(u, normal)) >= small_t) {
+	if (abs(dot(u, normal)) >= 0) {
    		return {this, t, part};
 		
         //Hit = {
