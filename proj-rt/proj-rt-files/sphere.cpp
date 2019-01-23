@@ -23,7 +23,7 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
 		if (t0 < t1 && t0 >= small_t) {
 			return {this, t0, part};
 		}
-		else if (t1 > t0 && t1 >= small_t) { //can this be else {...} ?
+		else if (t1 < t0 && t1 >= small_t) { //can this be else {...} ?
 			return {this, t1, part};
 		}
 	}
@@ -32,7 +32,7 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
 		t1 = 0;
 		
 		if (t0 >= small_t){
-			return {this, t1, part};
+			return {this, t0, part};
 		}
 	}
 	else { //det < 0
