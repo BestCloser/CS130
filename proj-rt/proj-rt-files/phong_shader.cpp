@@ -22,7 +22,9 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
     //  = R_a * L_a + R_d * L_d * max(n dot l, 0) + R_s * L_s * max(v dot r, 0)^a   <--
 	//                            n dot l = cos(theta)          v dot r = cos(phi)  a is alpha
     //Emitted_Light(const vec3& vector_to_light)
-    vec3 I_a = color_ambient * world.ambient_intensity * world.ambient_color;
+	
+	//I_a = ambient intensity = object's ambient color * world's ambient color * world's ambient intensity
+    vec3 I_a = color_ambient * world.ambient_color * world.ambient_intensity;
     //vec3 I_d = {0,0,0};
     //vec3 I_s = {0,0,0};
 
