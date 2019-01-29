@@ -29,8 +29,8 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
 	//The general idea for diffuse/specular compents is
 	//component_intensity = object's component's color * light produced * max([some vector, differs between diffuse and specular],0)
 	
-	vec3 l = color_diffuse - intersection_point;
-	vec3 I_d = color_diffuse * Emitted_Light(l) * max(dot(normal, l.normalized()), 0);
+	//vec3 l =  - intersection_point;
+	//vec3 I_d = color_diffuse * Emitted_Light(l) * max(dot(normal, l.normalized()), 0);
     
 	
 	//vec3 I_s = color_specular * ray.Emitted_Light(color_specular) * max(;
@@ -39,10 +39,9 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
     //color = R_a * Emitted_Light(this->color_ambient) +
 	//		  R_d * Emitted_Light(this->color_diffuse) + 
 	//		  R_s * Emitted_Light(this->color_specular)
-    color = I_a + I_d; // + I_s;
+    color = I_a;// + I_d; // + I_s;
 
-	//PLS WORK
-	
+	//will fix rest another day, submit for 20 points first
 	
     return color;
 }
