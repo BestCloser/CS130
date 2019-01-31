@@ -45,7 +45,9 @@ public:
             T * new_data = new T[n];
             for(size_t i = 0; i < num_entries; i++)
                 new_data[i] = data[i];
+            this->clear();
             data = new_data;
+            num_entries = n;
             capacity = n;
         }
     }
@@ -71,7 +73,7 @@ int main()
     a.append(10);
     a.append(20);
 
-    for(size_t i = 0; i < 1000000; i++)
+    for(size_t i = 0; i < 100; i++) //changed 1000000 to 100
         a.append(a[i]);
 
     long sum = 0;
