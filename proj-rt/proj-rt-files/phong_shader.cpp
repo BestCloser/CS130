@@ -25,23 +25,39 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
 	
 	//I_a = ambient intensity = object's ambient color * world's ambient color * world's ambient intensity
     vec3 I_a = color_ambient * world.ambient_color * world.ambient_intensity;
-    
-	//The general idea for diffuse/specular compents is
-	//component_intensity = object's component's color * light produced * max([some vector, differs between diffuse and specular],0)
-	
-	//vec3 l =  - intersection_point;
-	//vec3 I_d = color_diffuse * Emitted_Light(l) * max(dot(normal, l.normalized()), 0);
-    
-	
-	//vec3 I_s = color_specular * ray.Emitted_Light(color_specular) * max(;
+    vec3 I_d, I_s;
+	double diffMax, specMax;
 
+
+	Light *curr;
+    
+    
+    for(unsigned int i = 0; i < world.lights.size(); ++i){
+        curr = world.lights.at(i);
+        
+        vec3 L = curr->position - intersection_point;
+        
+        diffMax = std::max(dot(normal.normalized(), L.normalized()), 0.0);
+
+        //vec3 I_d = color_diffuse * Emitted_Light(l) * max(dot(normal, l.normalized()), 0);
+    
+       	I_d = I_d + color_diffuse * curr->Emitted_Light(intersection_point - curr->position) * diffMax;
+        
+       	//vec3 I_s = color_specular * ray.Emitted_Light(color_specular) * max(;
+
+
+        specMax = pow(std::max(dot((intersection_point - ray.endpoint).normalized(), (L - 2*dot(L,normal) * normal).normalized()), 0.0), specular_power);
+        
+        
+        I_s = I_s + color_specular * curr->Emitted_Light(intersection_point - curr->position) * specMax;
+    }
+       
+	
 
     //color = R_a * Emitted_Light(this->color_ambient) +
 	//		  R_d * Emitted_Light(this->color_diffuse) + 
 	//		  R_s * Emitted_Light(this->color_specular)
-    color = I_a;// + I_d; // + I_s;
+    color = I_a + I_d + I_s;
 
-	//will fix rest another day, submit for 20 points first
-	
     return color;
 }
