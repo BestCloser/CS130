@@ -41,7 +41,8 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
 
         //vec3 I_d = color_diffuse * Emitted_Light(l) * max(dot(normal, l.normalized()), 0);
     
-       	I_d = I_d + color_diffuse * curr->Emitted_Light(intersection_point - curr->position) * diffMax;
+       	//I_d = I_d + color_diffuse * curr->Emitted_Light(intersection_point - curr->position) * diffMax;
+        I_d = I_d + color_diffuse * curr->Emitted_Light(L) * diffMax;
         
        	//vec3 I_s = color_specular * ray.Emitted_Light(color_specular) * max(;
 
@@ -49,7 +50,8 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
         specMax = pow(std::max(dot((intersection_point - ray.endpoint).normalized(), (L - 2*dot(L,normal) * normal).normalized()), 0.0), specular_power);
         
         
-        I_s = I_s + color_specular * curr->Emitted_Light(intersection_point - curr->position) * specMax;
+        //I_s = I_s + color_specular * curr->Emitted_Light(intersection_point - curr->position) * specMax;
+        I_s = I_s + color_specular * curr->Emitted_Light(L) * specMax;
     }
        
 	
