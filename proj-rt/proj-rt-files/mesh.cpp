@@ -50,7 +50,7 @@ Hit Mesh::Intersection(const Ray& ray, int part) const
 
     if (part >= 0) {
         if (Intersect_Triangle(ray, part, distance)) {
-            return (this, distance, part);
+            return {this, distance, part};
         }
     }
     else {
@@ -58,7 +58,7 @@ Hit Mesh::Intersection(const Ray& ray, int part) const
             i++;
         }
         if (i != triangles.size()) {
-            return (this, distance, i);
+            return {this, distance, i};
         }
     }
 
