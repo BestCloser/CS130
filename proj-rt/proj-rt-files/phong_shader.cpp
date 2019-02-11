@@ -30,22 +30,32 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
 
 
 	Light *curr;
-    
+    vec3 shadowRay;
+    Ray shadow_ray;
+    Hit intersection;
     
     for (unsigned int i = 0; i < world.lights.size(); ++i) {
         curr = world.lights.at(i);
         
-        vec3 L = curr->position - intersection_point;
+        shadowRay = curr->position - intersection_point;
+        shadow_ray.endpoint = intersection_point;
+        shadow_ray.direction = (curr->position - intersection_point).normalized();
+        intersection = world.Closest_Intersection(shadow_ray);
 
-        //vec3 I_d = color_diffuse * Emitted_Light(L) * max(dot(n.L, 0);
-        diffMax = std::max(dot(normal.normalized(), L.normalized()), 0.0);
-    
-       	I_d = I_d + color_diffuse * curr->Emitted_Light(L) * diffMax;
+
+        if (!world.enable_shadows || (world.enable_shadows && (!intersection.object || intersection.dist >= shadowRay.magnitude()))) {
+            vec3 L = curr->position - intersection_point;
+
+            //vec3 I_d = color_diffuse * Emitted_Light(L) * max(dot(n.L, 0);
+            diffMax = std::max(dot(normal.normalized(), L.normalized()), 0.0);
         
-       	//vec3 I_s = color_specular * ray.Emitted_Light(L) * max(v.r, 0)^a;
-        specMax = pow(std::max(dot((intersection_point - ray.endpoint).normalized(), (L - 2*dot(L, normal) * normal).normalized()), 0.0), specular_power);
-       	
-        I_s = I_s + color_specular * curr->Emitted_Light(L) * specMax;
+           	I_d = I_d + color_diffuse * curr->Emitted_Light(L) * diffMax;
+            
+           	//vec3 I_s = color_specular * ray.Emitted_Light(L) * max(v.r, 0)^a;
+            specMax = pow(std::max(dot((intersection_point - ray.endpoint).normalized(), (L - 2*dot(L, normal) * normal).normalized()), 0.0), specular_power);
+           	
+            I_s = I_s + color_specular * curr->Emitted_Light(L) * specMax;
+        }
     }
        
 	//this looks wrong but it works i guess... pls work for rest of project
