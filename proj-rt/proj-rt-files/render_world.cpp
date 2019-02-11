@@ -79,10 +79,10 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 
 	//vec3 temp;
 	
-	if (closest_hit.dist != 0) {		//there is an intersection
+	if (closest_hit.object != nullptr && recursion_depth <= recursion_depth_limit) {
 		int_pt = ray.Point(closest_hit.dist);
 	//	std::cout << "BEFORE NORMAL\n";
-		normal = closest_hit.object->Normal(int_pt, -1);
+		normal = closest_hit.object->Normal(int_pt, closest_hit.part);
 	//	std::cout << "AFTER NORMAL\n";
 		
 		
