@@ -18,7 +18,7 @@ void initialize_render(driver_state& state, int width, int height)
 {
     state.image_width=width;
     state.image_height=height;
-    state.image_color=0;
+    state.image_color=make_pixel(0,0,0); //initialize the color black: rgb(0,0,0)
     state.image_depth=0;
     std::cout<<"TODO: allocate and initialize state.image_color and state.image_depth."<<std::endl;
 }
