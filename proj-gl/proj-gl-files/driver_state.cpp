@@ -22,10 +22,10 @@ void initialize_render(driver_state& state, int width, int height)
     state.image_depth=0;
 //    std::cout<<"TODO: allocate and initialize state.image_color and state.image_depth."<<std::endl;
 
-    unsigned long total_pixels = width * height;
+    unsigned int total_pixels = width * height;
     state.image_color = new pixel[total_pixels];
     
-    for (unsigned int i = 0; i < total_pixels; ++i) {
+    for (size_t i = 0; i < total_pixels; i++) {
  		state.image_color[i] = make_pixel(0, 0, 0); //initialize the color black: rgb(0,0,0)
  	}
 }
@@ -49,31 +49,38 @@ void render(driver_state& state, render_type type)
     int floats_per_vertex
 	
 	*/
-
-    //data_geometry = {vec4 gl_Position, float * data};
-
-    //how to get gl_Position
-    vec4 gl_Position = ???;
-    float * curr = state->vertex_data;
-    unsigned int i;
-    //data_geometry idk = {gl_Position, data};
+    data_geometry *triangle = new data_geometry[3];
+    float *ptr = state.vertex_data;
+    data_vertex in{};
     
-    while (curr != nullptr) {
-    	data_geometry arr[3];
-	    for (i = 0; i < 3; ++i) {
-	    	arr[i] = {gl_Position, curr};
-
-	    	if (curr->next != nullptr) {
-	    		curr = curr->next;
-	    	}
-	    	else {
-	    		break; //no more triangles can be made?
-	    	}
-	    }
-	    //data_geometry arr[3] = {?, ?, ?};
-	    rasterize_triangle(state, arr);
-	    i = 0;
-	}
+    
+    switch (type) {
+        case render_type::triangle:
+            std::cout<<"render_type triangle \n";
+            for(size_t i = 0, j = 0; i < state.num_vertices; i++, j++) {
+                triangle[i].data = ptr;
+                in.data = ptr;
+                state.vertex_shader(in, triangle[i], state.uniform_data);
+                if(j == 2){
+                    rasterize_triangle(state, (const data_geometry**) &triangle);
+                    j = 0;
+                }
+                ptr += state.floats_per_vertex;
+            }
+        
+            break;
+        case render_type::indexed:
+            break;
+        case render_type::fan:
+            break;
+        case render_type::strip:
+            break;
+        default:
+            break;
+    }
+    
+    delete [] triangle;
+    
 
 }
 
