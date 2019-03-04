@@ -118,8 +118,12 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
     int x[3], y[3];
     
     for(unsigned int a = 0; a < 3; a++){
-        int i = static_cast<int>((state.image_width / 2.0) * (*in)[a].gl_Position[0] + ((state.image_width / 2.0) - 0.5));
-        int j = static_cast<int>((state.image_height / 2.0) * (*in)[a].gl_Position[1] + ((state.image_height / 2.0) - 0.5));
+        int i = static_cast<int>((state.image_width / 2.0) 
+                * (*in)[a].gl_Position[0]/(*in)[a].gl_Position[3] 
+                + ((state.image_width / 2.0) - 0.5));
+        int j = static_cast<int>((state.image_height / 2.0) 
+                * (*in)[a].gl_Position[1]/(*in)[a].gl_Position[3] 
+                + ((state.image_height / 2.0) - 0.5));
         x[a] = i;
         y[a] = j;
         
@@ -129,6 +133,13 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
     
     float area_abc = (0.5f * ((x[1]*y[2] - x[2]*y[1]) - (x[0]*y[2] - x[2]*y[0]) - (x[0]*y[1] - x[1]*y[0])));
     
+
+    auto *data = new float[MAX_FLOATS_PER_VERTEX];
+    data_fragment fragment_data{data};
+    data_output out_data;
+    
+
+
     for(int j = 0; j < state.image_height; ++j){
         for(int i = 0; i < state.image_width; ++i){
             float alpha = (0.5f * ((x[1] * y[2] - x[2] * y[1]) + (y[1] - y[2])*i + (x[2] - x[1])*j)) / area_abc;
@@ -136,11 +147,57 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
             float gamma = (0.5f * ((x[0] * y[1] - x[1] * y[0]) + (y[0] - y[1])*i + (x[1] - x[0])*j)) / area_abc;
         
             if(alpha >= 0 && beta >= 0 && gamma >= 0){
-                state.image_color[i + j * state.image_width] = make_pixel(255, 255, 255);
+                //state.image_color[i + j * state.image_width] = make_pixel(255, 255, 255);
+                const float alpha_p = alpha;
+                const float beta_p = beta;
+                const float gamma_p = gamma;
+                
+
+
+                for(int k = 0; k < state.floats_per_vertex; ++k){
+                    float k_gour;
+                    switch(state.interp_rules[k]){
+                        case interp_type::flat:
+                            
+                            fragment_data.data[k] = (*in)[0].data[k];
+                            
+                            break;
+                        case interp_type::smooth:
+                            
+                            k_gour = (alpha_p / (*in)[0].gl_Position[3])
+                                        + (beta_p / (*in)[1].gl_Position[3])
+                                        + (gamma_p / (*in)[2].gl_Position[3]);
+                            
+                            
+                            alpha = alpha_p / (k_gour * (*in)[0].gl_Position[3]);
+                            beta = beta_p / (k_gour * (*in)[1].gl_Position[3]);
+                            gamma = gamma_p / (k_gour * (*in)[2].gl_Position[3]);
+                            
+                            //fragment_data.data[k] = alpha + beta + gamma;
+                            break;
+                        case interp_type::noperspective:
+                            
+                            fragment_data.data[k] = alpha * (*in)[0].data[k]
+                                                    + beta * (*in)[1].data[k]
+                                                    + gamma * (*in)[2].data[k];
+                            
+                            break;
+                        default:
+                            break;
+                            
+                            
+                    }
+                }
+                
+                state.fragment_shader(fragment_data, out_data, state.uniform_data);
+                
+                state.image_color[i + j * state.image_width] = make_pixel(static_cast<int>(out_data.output_color[0] * 255),
+                                                                          static_cast<int>(out_data.output_color[1] * 255),
+                                                                          static_cast<int>(out_data.output_color[2] * 255));
             }
         }
     }
-
-    
+    delete [] data;
 }
+
 
