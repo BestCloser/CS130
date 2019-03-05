@@ -217,7 +217,7 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
             }
         }
     }
-    delete [] data;
+//    delete [] data;
 }
 
 
