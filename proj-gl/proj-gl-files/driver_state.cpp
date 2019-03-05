@@ -131,7 +131,7 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
         //image_index = i + j * state.image_width
     }
     
-    float area_abc = (0.5f * ((x[1]*y[2] - x[2]*y[1]) - (x[0]*y[2] - x[2]*y[0]) - (x[0]*y[1] - x[1]*y[0])));
+    float area_abc = (0.5 * ((x[1]*y[2] - x[2]*y[1]) - (x[0]*y[2] - x[2]*y[0]) - (x[0]*y[1] - x[1]*y[0])));
     
 
     auto *data = new float[MAX_FLOATS_PER_VERTEX];
@@ -142,17 +142,13 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
 
     for(int j = 0; j < state.image_height; ++j){
         for(int i = 0; i < state.image_width; ++i){
-            float alpha = (0.5f * ((x[1] * y[2] - x[2] * y[1]) + (y[1] - y[2])*i + (x[2] - x[1])*j)) / area_abc;
-            float beta = (0.5f * ((x[2] * y[0] - x[0] * y[2]) + (y[2] - y[0])*i + (x[0] - x[2])*j)) / area_abc;
-            float gamma = (0.5f * ((x[0] * y[1] - x[1] * y[0]) + (y[0] - y[1])*i + (x[1] - x[0])*j)) / area_abc;
+            float alpha = (0.5 * ((x[1] * y[2] - x[2] * y[1]) + (y[1] - y[2])*i + (x[2] - x[1])*j)) / area_abc;
+            float beta = (0.5 * ((x[2] * y[0] - x[0] * y[2]) + (y[2] - y[0])*i + (x[0] - x[2])*j)) / area_abc;
+            float gamma = (0.5 * ((x[0] * y[1] - x[1] * y[0]) + (y[0] - y[1])*i + (x[1] - x[0])*j)) / area_abc;
         
             if(alpha >= 0 && beta >= 0 && gamma >= 0){
                 //state.image_color[i + j * state.image_width] = make_pixel(255, 255, 255);
-                const float alpha_p = alpha;
-                const float beta_p = beta;
-                const float gamma_p = gamma;
                 
-
 
                 for(int k = 0; k < state.floats_per_vertex; ++k){
                     float k_gour;
@@ -164,14 +160,14 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
                             break;
                         case interp_type::smooth:
                             
-                            k_gour = (alpha_p / (*in)[0].gl_Position[3])
-                                        + (beta_p / (*in)[1].gl_Position[3])
-                                        + (gamma_p / (*in)[2].gl_Position[3]);
+                            k_gour = (alpha / (*in)[0].gl_Position[3])
+                                        + (beta / (*in)[1].gl_Position[3])
+                                        + (gamma / (*in)[2].gl_Position[3]);
                             
                             
-                            alpha = alpha_p / (k_gour * (*in)[0].gl_Position[3]);
-                            beta = beta_p / (k_gour * (*in)[1].gl_Position[3]);
-                            gamma = gamma_p / (k_gour * (*in)[2].gl_Position[3]);
+                            alpha = alpha / (k_gour * (*in)[0].gl_Position[3]);
+                            beta = beta / (k_gour * (*in)[1].gl_Position[3]);
+                            gamma = gamma / (k_gour * (*in)[2].gl_Position[3]);
                             
                             //fragment_data.data[k] = alpha + beta + gamma;
                             break;
