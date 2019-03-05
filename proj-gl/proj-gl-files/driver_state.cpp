@@ -26,7 +26,7 @@ void initialize_render(driver_state& state, int width, int height)
     state.image_color = new pixel[total_pixels];
     
 
-    state.image_depth = new float[width * height];
+    state.image_depth = new float[total_pixels];
         
     for (size_t i = 0; i < total_pixels; i++) {
  		state.image_color[i] = make_pixel(0, 0, 0); //initialize the color black: rgb(0,0,0)
@@ -161,7 +161,7 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
                 data_fragment fragment_data{data};
                 data_output out_data;
             
-                float depth1 = alpha * in[0]->gl_Position[2] + beta * in[1]->gl_Position[2] + gamma * in[2]->gl_Position[2];
+                float depth1 = alpha * (*in)[0].gl_Position[2] + beta * (*in)[1].gl_Position[2] + gamma * (*in)[2].gl_Position[2];
 
                 if (depth1 > state.image_depth[image_index]) {
                     continue;
@@ -208,9 +208,9 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
                 
 
 
-                state.image_color[i + j * state.image_width] = make_pixel((out_data.output_color[0] * 255),
-                                                                          (out_data.output_color[1] * 255),
-                                                                          (out_data.output_color[2] * 255));
+                state.image_color[image_index] = make_pixel((out_data.output_color[0] * 255),
+                                                            (out_data.output_color[1] * 255),
+                                                            (out_data.output_color[2] * 255));
             
                 state.image_depth[image_index] = depth1;
 
