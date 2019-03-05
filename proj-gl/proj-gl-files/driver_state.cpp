@@ -155,7 +155,7 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
             if(alpha >= 0 && beta >= 0 && gamma >= 0){
                 //state.image_color[i + j * state.image_width] = make_pixel(255, 255, 255);
                 
-                image_index = i + j * state.image_width
+                image_index = i + j * state.image_width;
 
                 auto *data = new float[MAX_FLOATS_PER_VERTEX];
                 data_fragment fragment_data{data};
