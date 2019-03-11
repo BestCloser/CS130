@@ -1,5 +1,6 @@
 #include "driver_state.h"
 #include <cstring>
+#include <cfloat>
 
 driver_state::driver_state()
 {
@@ -18,20 +19,20 @@ void initialize_render(driver_state& state, int width, int height)
 {
     state.image_width=width;
     state.image_height=height;
-    state.image_color=0;
-    state.image_depth=0;
-//    std::cout<<"TODO: allocate and initialize state.image_color and state.image_depth."<<std::endl;
-
-    unsigned int total_pixels = width * height;
-    state.image_color = new pixel[total_pixels];
+    state.image_color=nullptr;
+    state.image_depth=nullptr;
+    //std::cout<<"TODO: allocate and initialize state.image_color and state.image_depth."<<std::endl;
     
-
-    state.image_depth = new float[total_pixels];
+    unsigned long long total_pixel = width * height;           //check, might be okay with unsigned int (pixel)
+    state.image_color = new pixel[total_pixel];
+    state.image_depth = new float[total_pixel];
+    
+    for(size_t i = 0; i < total_pixel; ++i){
         
-    for (size_t i = 0; i < total_pixels; i++) {
- 		state.image_color[i] = make_pixel(0, 0, 0); //initialize the color black: rgb(0,0,0)
-        state.image_depth[i] = 2;
+        state.image_color[i] = make_pixel(0,0,0);
+        state.image_depth[i] = FLT_MAX;
     }
+    
 }
 
 // This function will be called to render the data that has been stored in this class.
@@ -44,27 +45,120 @@ void initialize_render(driver_state& state, int width, int height)
 void render(driver_state& state, render_type type)
 {
     //std::cout<<"TODO: implement rendering."<<std::endl;
-
     
-    /* driver_state:
-
-    float * vertex_data
-    int num_vertices
-    int floats_per_vertex
-	
-	*/
     data_geometry *triangle = new data_geometry[3];
     float *ptr = state.vertex_data;
     data_vertex in{};
     
     
+   float *v1_fan = ptr;
+
     switch (type) {
         case render_type::triangle:
             //std::cout<<"render_type triangle \n";
-            for(size_t i = 0; i < (state.num_vertices/3.0); ++i) {
+            /*
+             XYZ XYZ XYZ
+                         XYZ XYZ XYZ
+                                     XYZ XYZ XYZ ...
+             for every /3
+             */
+            
+            //loops after every 3 points
+            for(size_t i = 0; i < (state.num_vertices/3); ++i) {
+                //fills the triangle vertex data
                 for(unsigned j = 0; j < 3; ++j){
                     triangle[j].data = ptr;
                     ptr += state.floats_per_vertex;
+                }
+                //calls the vertx shader to shade in each vertex in the triangle
+                for(unsigned k = 0; k < 3; ++k){
+                    in.data = triangle[k].data;
+                    state.vertex_shader(in, triangle[k], state.uniform_data);
+                }
+                
+                rasterize_triangle(state, (const data_geometry**) &triangle);
+            }
+
+            break;
+        case render_type::strip:
+            /* j0  j1  j2
+                XYZ XYZ XYZ     i = 0
+                    j0  j1  j2
+                    XYZ XYZ XYZ     i = 1
+                        j0  j1 j2
+                        XYZ XYZ XYZ ...
+             
+             for every /2?
+             */
+            //should increment every 1 time?
+            //float *v2_shared;
+            //float *v3_shared;
+            for(size_t i = 0; i < (state.num_vertices/3); ++i) {
+                
+                for(unsigned j = 0; j < 3; ++j){
+                    if(i == 0){
+                        triangle[j].data = ptr;  //ptr = 0,1,2
+                        ptr += state.floats_per_vertex;
+
+                    }
+                    else{ //i > 0
+                        if(j < 2){  //j = 0,1
+                            triangle[j].data = triangle[j+1].data;  //new j0 = old j1
+                        }
+                        else{   //j = 2
+                            ptr += state.floats_per_vertex;
+                            triangle[j].data = ptr;
+                        }
+                    }
+                }
+
+                for(unsigned k = 0; k < 3; ++k){
+                    in.data = triangle[k].data;
+                    state.vertex_shader(in, triangle[k], state.uniform_data);
+                }
+                
+                rasterize_triangle(state, (const data_geometry**) &triangle);
+            }
+
+            
+            
+            break;
+        case render_type::fan:
+            /*
+             XYZ XYZ XYZ
+             XYZ     XYZ XYZ
+             XYZ         XYZ XYZ
+             XYZ             XYZ XYZ ...
+             
+             */
+            std::cout<<"!!render type fan!!\n";
+            
+            triangle[0].data = v1_fan; //triangle[0].data set outside for loop, wont change values
+            
+            for(size_t i = 0; i < (state.num_vertices/3); ++i) {
+                std::cout<<"!!render type fan i = " <<i <<"\n";
+
+                for(unsigned j = 1; j < 3; ++j){
+                    std::cout<<"!!render type fan j = " <<j <<"\n";
+
+                    if(i == 0){
+                        
+                        ptr += state.floats_per_vertex;
+
+                        triangle[j].data = ptr;  //ptr = 1,2
+
+                    }
+                    else{ //i > 0
+
+                        if(j == 1){  //j = 0,1
+                            triangle[j].data = triangle[j+1].data;  //new j0 = old j1
+                        }
+                        
+                        if(j == 2){   //j = 2
+                            ptr += state.floats_per_vertex;
+                            triangle[j].data = ptr;
+                        }
+                    }
                 }
                 
                 for(unsigned k = 0; k < 3; ++k){
@@ -72,22 +166,16 @@ void render(driver_state& state, render_type type)
                     state.vertex_shader(in, triangle[k], state.uniform_data);
                 }
                 
-                triangle[0].gl_Position /= triangle[0].gl_Position[3];
-                triangle[1].gl_Position /= triangle[1].gl_Position[3];
-                triangle[2].gl_Position /= triangle[2].gl_Position[3];
-
-
                 rasterize_triangle(state, (const data_geometry**) &triangle);
             }
-
-
-        
+            
+            
             break;
         case render_type::indexed:
-            break;
-        case render_type::fan:
-            break;
-        case render_type::strip:
+            
+            /*
+             For each indexed, lOOp
+             */
             break;
         default:
             break;
@@ -95,7 +183,6 @@ void render(driver_state& state, render_type type)
     
     delete [] triangle;
     
-
 }
 
 
@@ -105,7 +192,7 @@ void render(driver_state& state, render_type type)
 // simply pass the call on to rasterize_triangle.
 void clip_triangle(driver_state& state, const data_geometry* in[3],int face)
 {
-    if(face==6)
+    if(face == 6)
     {
         rasterize_triangle(state, in);
         return;
@@ -120,57 +207,71 @@ void clip_triangle(driver_state& state, const data_geometry* in[3],int face)
 void rasterize_triangle(driver_state& state, const data_geometry* in[3])
 {
     //std::cout<<"TODO: implement rasterization"<<std::endl;
-
-
-	//i = w/2 * x + w/2 - 1/2
+    //i = w/2 * x + w/2 - 1/2
     //j = h/2 * y + h/2 - 1/2
     int x[3], y[3];
     
-    int image_index;
-
-    for(unsigned int a = 0; a < 3; a++){
-        int i = static_cast<int>((state.image_width / 2.0) 
-                * (*in)[a].gl_Position[0] 
-                + ((state.image_width / 2.0) - 0.5));
-        int j = static_cast<int>((state.image_height / 2.0) 
-                * (*in)[a].gl_Position[1] 
-                + ((state.image_height / 2.0) - 0.5));
+    //Calculats i & j coordinates in NDC for vertices
+    for(unsigned int a = 0; a < 3; ++a){
+        int i = static_cast<int>((state.image_width / 2.0f)
+                                 * (*in)[a].gl_Position[0]/(*in)[a].gl_Position[3]
+                                 + ((state.image_width / 2.0f) - 0.5f));
+        int j = static_cast<int>((state.image_height / 2.0f)
+                                 * (*in)[a].gl_Position[1]/(*in)[a].gl_Position[3]
+                                 + ((state.image_height / 2.0f) - 0.5f));
         x[a] = i;
         y[a] = j;
         
         //state.image_color[i + j * state.image_width] = make_pixel(255, 255, 255);
-        //image_index = i + j * state.image_width
+        
     }
     
-    float area_abc = (0.5 * ((x[1]*y[2] - x[2]*y[1]) - (x[0]*y[2] - x[2]*y[0]) + (x[0]*y[1] - x[1]*y[0])));
+    //finds the min/max of triangle
+    int min_x = std::min(std::min(x[0], x[1]), x[2]);
+    int max_x = std::max(std::max(x[0], x[1]), x[2]);
+    int min_y = std::min(std::min(y[0], y[1]), y[2]);
+    int max_y = std::max(std::max(y[0], y[1]), y[2]);
     
-
-
-    for(int j = 0; j < state.image_height; ++j){
-        for(int i = 0; i < state.image_width; ++i){
-            float alpha = (0.5 * ((x[1] * y[2] - x[2] * y[1]) + (y[1] - y[2])*i + (x[2] - x[1])*j)) / area_abc;
-            float beta = (0.5 * ((x[2] * y[0] - x[0] * y[2]) + (y[2] - y[0])*i + (x[0] - x[2])*j)) / area_abc;
-            float gamma = (0.5 * ((x[0] * y[1] - x[1] * y[0]) + (y[0] - y[1])*i + (x[1] - x[0])*j)) / area_abc;
-        
-            if(alpha >= 0 && beta >= 0 && gamma >= 0){
-                //state.image_color[i + j * state.image_width] = make_pixel(255, 255, 255);
-                
-                image_index = i + j * state.image_width;
-
-                auto *data = new float[MAX_FLOATS_PER_VERTEX];
-                data_fragment fragment_data{data};
-                data_output out_data;
+    
+    //Makes sure triangle is within pixel grid
+    if(min_x < 0){
+        min_x = 0;
+    }
+    if(min_y < 0){
+        min_y = 0;
+    }
+    if(max_x > state.image_width){
+        max_x = state.image_width - 1;
+    }
+    if(max_y > state.image_height){
+        max_y = state.image_height - 1;
+    }
+    
+    //calculates area of the triangle
+    float area_abc = (0.5f * ((x[1]*y[2] - x[2]*y[1]) - (x[0]*y[2] - x[2]*y[0]) + (x[0]*y[1] - x[1]*y[0])));
+    
+    auto *data = new float[MAX_FLOATS_PER_VERTEX];
+    data_fragment fragment_data{data};
+    data_output out_data;
+    
+    for(int j = min_y; j <= max_y; ++j){
+        for(int i = min_x; i <= max_x; ++i){
             
-                float depth1 = alpha * (*in)[0].gl_Position[2] + beta * (*in)[1].gl_Position[2] + gamma * (*in)[2].gl_Position[2];
+            float alpha = (0.5f * ((x[1] * y[2] - x[2] * y[1]) + (y[1] - y[2])*i + (x[2] - x[1])*j)) / area_abc;
+            float beta = (0.5f * ((x[2] * y[0] - x[0] * y[2]) + (y[2] - y[0])*i + (x[0] - x[2])*j)) / area_abc;
+            float gamma = (0.5f * ((x[0] * y[1] - x[1] * y[0]) + (y[0] - y[1])*i + (x[1] - x[0])*j)) / area_abc;
+        
+            float depth = (alpha * (*in)[0].gl_Position[2]) + (beta * (*in)[1].gl_Position[2]) + (gamma * (*in)[2].gl_Position[2]);
 
-                if (depth1 > state.image_depth[image_index]) {
-                    continue;
-                }
-
-
-
+            
+            if(alpha >= 0 && beta >= 0 && gamma >= 0 && depth < state.image_depth[i + j * state.image_width]){
+                const float alpha_p = alpha;
+                const float beta_p = beta;
+                const float gamma_p = gamma;
+                
                 for(int k = 0; k < state.floats_per_vertex; ++k){
                     float k_gour;
+                    
                     switch(state.interp_rules[k]){
                         case interp_type::flat:
                             
@@ -179,17 +280,15 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
                             break;
                         case interp_type::smooth:
                             
-                            k_gour = (alpha / (*in)[0].gl_Position[3])
-                                        + (beta / (*in)[1].gl_Position[3])
-                                        + (gamma / (*in)[2].gl_Position[3]);
+                            k_gour = (alpha_p / (*in)[0].gl_Position[3])
+                                        + (beta_p / (*in)[1].gl_Position[3])
+                                        + (gamma_p / (*in)[2].gl_Position[3]);
                             
                             
-                            alpha = alpha / (k_gour * (*in)[0].gl_Position[3]);
-                            beta = beta / (k_gour * (*in)[1].gl_Position[3]);
-                            gamma = gamma / (k_gour * (*in)[2].gl_Position[3]);
+                            alpha = alpha_p / (k_gour * (*in)[0].gl_Position[3]);
+                            beta = beta_p / (k_gour * (*in)[1].gl_Position[3]);
+                            gamma = gamma_p / (k_gour * (*in)[2].gl_Position[3]);
                             
-                            //fragment_data.data[k] = alpha + beta + gamma;
-                            break;
                         case interp_type::noperspective:
                             
                             fragment_data.data[k] = alpha * (*in)[0].data[k]
@@ -204,20 +303,18 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
                     }
                 }
                 
-                state.fragment_shader(fragment_data, out_data, state.uniform_data);
                 
+                
+                state.fragment_shader(fragment_data, out_data, state.uniform_data);
+                //out_data.output_color = out_data.output_color * 255;
 
-
-                state.image_color[image_index] = make_pixel((out_data.output_color[0] * 255),
-                                                            (out_data.output_color[1] * 255),
-                                                            (out_data.output_color[2] * 255));
-            
-                state.image_depth[image_index] = depth1;
-
+                state.image_color[i + j * state.image_width] = make_pixel((out_data.output_color[0] * 255),
+                                                                          (out_data.output_color[1] * 255),
+                                                                          (out_data.output_color[2] * 255));
+                state.image_depth[i + j * state.image_width] = depth;
             }
         }
     }
-//    delete [] data; 
+    //std::cout<<"TODO: implement rasterization"<<std::endl;
+    delete [] data;
 }
-
-
