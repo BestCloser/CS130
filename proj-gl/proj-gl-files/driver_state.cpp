@@ -53,7 +53,7 @@ void render(driver_state& state, render_type type)
                 for (int j = 0; j < 3; j++) { 
                     tri_array[j] = new data_geometry;
                     data_vertex v;
-                    ver.data = new float[MAX_FLOATS_PER_VERTEX];
+                    v.data = new float[MAX_FLOATS_PER_VERTEX];
                     tri_array[j]->data = new float[MAX_FLOATS_PER_VERTEX];
                     for (int k = 0; k < state.floats_per_vertex; k++) {
                         v.data[k] = state.vertex_data[k + state.floats_per_vertex*(i+j)];
