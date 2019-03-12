@@ -1,6 +1,5 @@
 #include "driver_state.h"
 #include <cstring>
-#include <algorithm>
 #include <cfloat>
 
 using namespace std;
