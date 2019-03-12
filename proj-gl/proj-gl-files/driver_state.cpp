@@ -49,20 +49,20 @@ void render(driver_state& state, render_type type)
         case render_type::triangle:
         {
             for (int i = 0; i < state.num_vertices; i += 3) { 
-                data_geometry** tri_array = new data_geometry*[3];
+                data_geometry** triangle = new data_geometry*[3];
                 for (int j = 0; j < 3; j++) { 
-                    tri_array[j] = new data_geometry;
+                    triangle[j] = new data_geometry;
                     data_vertex v;
                     v.data = new float[MAX_FLOATS_PER_VERTEX];
-                    tri_array[j]->data = new float[MAX_FLOATS_PER_VERTEX];
+                    triangle[j]->data = new float[MAX_FLOATS_PER_VERTEX];
                     for (int k = 0; k < state.floats_per_vertex; k++) {
                         v.data[k] = state.vertex_data[k + state.floats_per_vertex*(i+j)];
-                        tri_array[j]->data[k] = v.data[k];
+                        triangle[j]->data[k] = v.data[k];
                     }
-                    state.vertex_shader((const data_vertex)v, *tri_array[j], state.uniform_data);
+                    state.vertex_shader((const data_vertex)v, *triangle[j], state.uniform_data);
                 }
 
-                clip_triangle(state, (const data_geometry**)tri_array, 0);
+                clip_triangle(state, (const data_geometry**)triangle, 0);
             }
         }
         break;
@@ -70,15 +70,15 @@ void render(driver_state& state, render_type type)
         case render_type::indexed: 
         {
             const data_geometry *out[3];
-            data_geometry tri_array[3];
+            data_geometry triangle[3];
             data_vertex v[3];
 
             for (int i = 0; i < state.num_triangles * 3; i += 3) {
                 for(int j = 0; j < 3; j++) {
                     v[j].data = &state.vertex_data[state.index_data[i + j] * state.floats_per_vertex];
-                    tri_array[j].data = v[j].data;
-                    state.vertex_shader(v[j], tri_array[j], state.uniform_data);
-                    out[j] = &tri_array[j];
+                    triangle[j].data = v[j].data;
+                    state.vertex_shader(v[j], triangle[j], state.uniform_data);
+                    out[j] = &triangle[j];
                 }
                 clip_triangle(state, out, 0);
             }
@@ -88,7 +88,7 @@ void render(driver_state& state, render_type type)
         case render_type::fan: 
         {
             const data_geometry *out[3];
-            data_geometry tri_array[3];
+            data_geometry triangle[3];
             data_vertex v[3];
             int flag;
 
@@ -100,9 +100,9 @@ void render(driver_state& state, render_type type)
                     }
 
                     v[j].data = &state.vertex_data[flag * state.floats_per_vertex];
-                    tri_array[j].data = v[j].data;
-                    state.vertex_shader(v[j], tri_array[j], state.uniform_data);
-                    out[j] = &tri_array[j];
+                    triangle[j].data = v[j].data;
+                    state.vertex_shader(v[j], triangle[j], state.uniform_data);
+                    out[j] = &triangle[j];
                 }
                 clip_triangle(state, out, 0);
             }
@@ -112,15 +112,15 @@ void render(driver_state& state, render_type type)
         case render_type::strip: 
         {
             const data_geometry *out[3];
-            data_geometry tri_array[3];
+            data_geometry triangle[3];
             data_vertex v[3];
 
             for (int i = 0; i < state.num_vertices - 2; i++) {
                 for (int j = 0; j < 3; j++) {
                     v[j].data = &state.vertex_data[(i + j) * state.floats_per_vertex];
-                    tri_array[j].data = v[j].data;
-                    state.vertex_shader(v[j], tri_array[j], state.uniform_data);
-                    out[j] = &tri_array[j];
+                    triangle[j].data = v[j].data;
+                    state.vertex_shader(v[j], triangle[j], state.uniform_data);
+                    out[j] = &triangle[j];
                 }
                 clip_triangle(state, out, 0);
             }
@@ -139,13 +139,6 @@ void render(driver_state& state, render_type type)
 // simply pass the call on to rasterize_triangle.
 void clip_triangle(driver_state& state, const data_geometry* in[3],int face)
 {
-    // if(face==6)
-    // {
-    //     rasterize_triangle(state, in);
-    //     return;
-    // }
-    // std::cout<<"TODO: implement clipping. (The current code passes the triangle through without clipping them.)"<<std::endl;
-    // clip_triangle(state, in, face + 1);
 
     if (face == 1) {
         rasterize_triangle(state, in);
@@ -247,7 +240,7 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
     float ax, ay, bx, by, cx, cy;
     float area_abc, area_pbc, area_apc, area_abp;
     float alpha, beta, gamma;
-    float minx, miny, maxx, maxy;
+    float min_x, min_y, max_x, max_y;
     float alpha_per, beta_per, gamma_per;
 
     
@@ -260,31 +253,31 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
     cx = (state.image_width/2.0) * (in[2]->gl_Position[0]/in[2]->gl_Position[3]) + (state.image_width/2.0) - (0.5);
     cy = (state.image_height/2.0) * (in[2]->gl_Position[1]/in[2]->gl_Position[3]) + (state.image_height/2.0) - (0.5);
 
-    minx = std::min(ax, std::min(bx, cx));
-    miny = std::min(ay, std::min(by, cy));
-    maxx = std::max(ax, std::max(bx, cx));
-    maxy = std::max(ay, std::max(by, cy));
+    min_x = std::min(ax, std::min(bx, cx));
+    min_y = std::min(ay, std::min(by, cy));
+    max_x = std::max(ax, std::max(bx, cx));
+    max_y = std::max(ay, std::max(by, cy));
 
     area_abc = 0.5 * ((bx * cy - cx * by) - (ax * cy - cx * ay) + (ax * by - bx * ay));
    
-    if (minx < 0) {
-        minx = 0;
+    if (min_x < 0) {
+        min_x = 0;
     }
 
-    if (miny < 0) {
-        miny = 0;
+    if (min_y < 0) {
+        min_y = 0;
     }
 
-    if (maxx > state.image_width) {
-        maxx = state.image_width;
+    if (max_x > state.image_width) {
+        max_x = state.image_width;
     }
 
-    if (maxy > state.image_height) {
-        maxy = state.image_height;
+    if (max_y > state.image_height) {
+        max_y = state.image_height;
     }
 
-    for (int j = miny; j < maxy; j++) {
-        for (int i = minx; i < maxx; i++) {
+    for (int j = min_y; j < max_y; j++) {
+        for (int i = min_x; i < max_x; i++) {
             image_index = i + j * state.image_width;
             area_pbc = 0.5 * ((bx * cy - cx * by) - (i * cy - j * cx) + (i * by - j * bx));
             area_apc = 0.5 * ((i * cy - j * cx) - (ax * cy - cx * ay) + (j * ax - i * ay));
