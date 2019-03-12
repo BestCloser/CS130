@@ -241,7 +241,7 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
     float area_abc, area_pbc, area_apc, area_abp;
     float alpha, beta, gamma;
     float min_x, min_y, max_x, max_y;
-    float alpha_per, beta_per, gamma_per;
+    float alpha_p, beta_p, gamma_p;
 
     
     ax = (state.image_width/2.0) * (in[0]->gl_Position[0]/in[0]->gl_Position[3]) + (state.image_width/2.0) - (0.5);
@@ -305,11 +305,11 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
                             case interp_type::smooth:
                                 k_gour = (alpha/in[0]->gl_Position[3] + beta/in[1]->gl_Position[3] + gamma/in[2]->gl_Position[3]);
 
-                                alpha_per = alpha/k_gour/(in[0]->gl_Position[3]);
-                                beta_per = beta/k_gour/(in[1]->gl_Position[3]);
-                                gamma_per = gamma/k_gour/(in[2]->gl_Position[3]);
+                                alpha_p = alpha/k_gour/(in[0]->gl_Position[3]);
+                                beta_p = beta/k_gour/(in[1]->gl_Position[3]);
+                                gamma_p = gamma/k_gour/(in[2]->gl_Position[3]);
 
-                                frag.data[k] = alpha_per * in[0]->data[k] + beta_per * in[1]->data[k] + gamma_per * in[2]-> data[k];
+                                frag.data[k] = alpha_p * in[0]->data[k] + beta_p * in[1]->data[k] + gamma_p * in[2]-> data[k];
                             break;
 
                             case interp_type::noperspective:
