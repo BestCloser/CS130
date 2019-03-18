@@ -162,7 +162,7 @@ void application::draw_event()
 
         glVertex3f(particles[i].position[0] + 0.04*particles[i].velocity[0], 
                     particles[i].position[1] + 0.04*particles[i].velocity[1],
-                    particles[i].position[2] + 0.04*particles[i].velocity[2])
+                    particles[i].position[2] + 0.04*particles[i].velocity[2]);
     }
 
     glEnd();
@@ -333,7 +333,7 @@ void draw_obj(obj *o, const gl_image_texture_map& textures)
 
 
 void Particle::Euler_Step(float h) {
-        for (int i = 0; i < particles.size(); i++) {
+        for (unsigned i = 0; i < particles.size(); i++) {
             particles[i].old_position = particles[i].position;
             particles[i].position = particles[i].position + h * particles[i].velocity;
             particles[i].velocity = ((particles[i].position - particles[i].old_position) / h) + (h/particles[i].mass) * particles[i].force;
