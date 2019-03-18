@@ -131,10 +131,10 @@ void application::draw_event()
         //
         Add_Particles(20);
         for (int i = 0; i < particles.size(); i++) {
-            particles.at(i).Euler_Step(0.02);
-            particles.at(i).force[1] = -9.8 * particles.at(i).mass;
-            particles.at(i).Handle_collision(0.5, 0.5);
-            particles.at(i).Reset_Forces();
+            particles[i].Euler_Step(0.02);
+            particles[i].force[1] = -9.8 * particles[i].mass;
+            particles[i].Handle_collision(0.5, 0.5);
+            particles[i].Reset_Forces();
         }
 
     }
@@ -151,12 +151,12 @@ void application::draw_event()
         //
         //
     for (int i = 0; i < particles.size(); i++) {
-        glColor3f(particles.at(i).color[0], particles.at(i).color[1], particles.at(i).color[2]);
+        glColor3f(particles[i].color[0], particles[i].color[1], particles[i].color[2]);
 
-        glVertex3f(particles.at(i).position[0], particles.at(i).position[1], particles.at(i).position[2]);
-        glVertex3f(particles.at(i).position[0] + 0.04*particles.at(i).velocity[0], 
-                    particles.at(i).position[1] + 0.04*particles.at(i).velocity[1],
-                    particles.at(i).position[2] + 0.04*particles.at(i).velocity[2])
+        glVertex3f(particles[i].position[0], particles[i].position[1], particles[i].position[2]);
+        glVertex3f(particles[i].position[0] + 0.04*particles[i].velocity[0], 
+                    particles[i].position[1] + 0.04*particles[i].velocity[1],
+                    particles[i].position[2] + 0.04*particles[i].velocity[2])
     }
 
     glEnd();
@@ -341,9 +341,9 @@ struct Particle {
  public:
     void Euler_Step(float h) {
         for (int i = 0; i < particles.size(); i++) {
-            particles.at(i).old_position = particles.at(i).position;
-            particles.at(i).position = particles.at(i).position + h * particles.at(i).velocity;
-            particles.at(i).velocity = particles.at(i).velocity + (h/particles.at(i).mass) * particles.at(i).force;
+            particles[i].old_position = particles[i].position;
+            particles[i].position = particles[i].position + h * particles[i].velocity;
+            particles[i].velocity = particles[i].velocity + (h/particles[i].mass) * particles[i].force;
         }
     }
     
@@ -352,12 +352,12 @@ struct Particle {
     }
 
     void Handle_collision(float damping, float coeff_restitution) {
-        if (position.at(1) < 0) { // y value
-            position.at(1) = 0;
-            velocity.at(1) = coeff_restitution * velocity.at(1);
-            if (velocity.at(1) < 0) {
-                velocity.at(0) = damping * velocity.at(0);
-                velocity.at(1) = damping * velocity.at(1);
+        if (position[1] < 0) { // y value
+            position[1] = 0;
+            velocity[1] = coeff_restitution * velocity[1];
+            if (velocity[1] < 0) {
+                velocity[0] = damping * velocity[0];
+                velocity[1] = damping * velocity[1];
             }
         }
 
