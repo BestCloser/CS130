@@ -139,7 +139,6 @@ void application::draw_event()
             particles[i].force[1] = -9.8 * particles[i].mass;
             particles[i].Handle_collision(0.5, 0.5);
             particles[i].Reset_Forces();
-            particles[i].duration += h;
         }
 
     }
@@ -335,7 +334,7 @@ void draw_obj(obj *o, const gl_image_texture_map& textures)
 void Particle::Euler_Step(float h) {
     old_position = position;
     position = position + h * velocity;
-    velocity = (position - old_position) / h + (h/mass) * force;
+    velocity = velocity + (h/mass) * force;
 }
 
     
