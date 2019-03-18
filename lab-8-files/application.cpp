@@ -361,7 +361,7 @@ void Add_Particles(int n) {
             particles.resize(particles.size() + 1);
             curr = particles.size() - 1;
             particles[curr].mass = 1;
-            particles[curr].position = {random(0, 0.2), 0.05, random(0, 0.2)};
+            particles[curr].position = {random(-0.2, 0.2), 0.05, random(-0.2, 0.2)};
             particles[curr].velocity =  {10*particles[curr].position[0],
                                                             random(1, 10),
                                                             10*particles[curr].position[2]};
