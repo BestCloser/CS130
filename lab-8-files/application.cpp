@@ -366,7 +366,7 @@ void Add_Particles(int n) {
             particles[curr].velocity =  {10*particles[curr].position[0],
                                                             random(1, 10),
                                                             10*particles[curr].position[2]};
-            particles[curr].color = {255, 255, 0};
+            particles[curr].color = {1, 1, 0};
         }
 
     }
