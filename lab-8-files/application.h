@@ -61,5 +61,6 @@ struct Particle {
 
 void Add_Particles(int);
 float random(float, float);
+vec3 Get_Particle_Color(float);
 
 #endif

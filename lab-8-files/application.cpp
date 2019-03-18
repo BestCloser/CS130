@@ -139,6 +139,7 @@ void application::draw_event()
             particles[i].Euler_Step(0.02);
             particles[i].Handle_collision(0.5, 0.5);
             particles[i].Reset_Forces();
+            particle[i].color = Get_Particle_Color(d);
         }
 
     }
@@ -335,6 +336,7 @@ void Particle::Euler_Step(float h) {
     old_position = position;
     position = position + h * velocity;
     velocity = velocity + (h/mass) * force;
+    d += h;
 }
 
     
@@ -372,4 +374,26 @@ void Add_Particles(int n) {
 
 float random(float k, float l) {
     return (k + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(l - k))));
+}
+
+vec3 Get_Particle_Color(float d) {
+    float temp;
+    vec3 color = {1, 0.5, 0};
+    if (d < 0.1) {
+        color[1] = 1;
+    }
+    else if (d < 1.5) {
+        color[1] = 1-d/1.5;
+    }
+    else if (d < 2) {
+        color[1] = 0;
+    }
+    else if (d < 3) {
+        temp = (d - 2) * 0.5;
+        color = {1 - temp, temp, temp};
+    }
+    else {
+        return {0.5, 0.5, 0.5};
+    }
+    return color;
 }
