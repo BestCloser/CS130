@@ -17,6 +17,10 @@
 #endif
 
 using namespace std;
+
+vector<Particle> particles;     //global variable, i added this
+
+
 enum { NONE, AMBIENT, DIFFUSE, SPECULAR, NUM_MODES };
 
 void draw_grid(int dim);
@@ -130,11 +134,12 @@ void application::draw_event()
         // UPDATE THE COLOR OF THE PARTICLE DYNAMICALLY
         //
         Add_Particles(20);
-        for (int i = 0; i < particles.size(); i++) {
+        for (unsigned i = 0; i < particles.size(); i++) {
             particles[i].Euler_Step(0.02);
             particles[i].force[1] = -9.8 * particles[i].mass;
             particles[i].Handle_collision(0.5, 0.5);
             particles[i].Reset_Forces();
+            particles[i].duration += h;
         }
 
     }
@@ -150,10 +155,11 @@ void application::draw_event()
         // glVertex3f(...) endpoint 2
         //
         //
-    for (int i = 0; i < particles.size(); i++) {
+    for (unsigned i = 0; i < particles.size(); i++) {
         glColor3f(particles[i].color[0], particles[i].color[1], particles[i].color[2]);
 
         glVertex3f(particles[i].position[0], particles[i].position[1], particles[i].position[2]);
+
         glVertex3f(particles[i].position[0] + 0.04*particles[i].velocity[0], 
                     particles[i].position[1] + 0.04*particles[i].velocity[1],
                     particles[i].position[2] + 0.04*particles[i].velocity[2])
@@ -326,32 +332,21 @@ void draw_obj(obj *o, const gl_image_texture_map& textures)
 }
 
 
-vector<Particle> particles;
-
-struct Particle {
- public: //is this supposed to be private
-    float mass; //mass of the particle
-    vec3 position; //position of the particle
-    vec3 old_position; //old position
-    vec3 velocity; //velocity of the particle
-    vec3 force; //force applied on a particle
-    vec3 color; //color
-    float duration; //duration of particle
-
- public:
-    void Euler_Step(float h) {
+void Particle::Euler_Step(float h) {
         for (int i = 0; i < particles.size(); i++) {
             particles[i].old_position = particles[i].position;
             particles[i].position = particles[i].position + h * particles[i].velocity;
-            particles[i].velocity = particles[i].velocity + (h/particles[i].mass) * particles[i].force;
+            particles[i].velocity = ((particles[i].position - particles[i].old_position) / h) + (h/particles[i].mass) * particles[i].force;
         }
     }
     
-    void Reset_Forces() {
-        force = {0, 0, 0};
+void Particle::Reset_Forces() {
+    for (unsigned i = 0; i < particles.size(); i++) {
+        particles[i].force = {0, 0, 0};
     }
+}
 
-    void Handle_collision(float damping, float coeff_restitution) {
+void Particle::Handle_collision(float damping, float coeff_restitution) {
         if (position[1] < 0) { // y value
             position[1] = 0;
             velocity[1] = coeff_restitution * velocity[1];
@@ -363,22 +358,21 @@ struct Particle {
 
     }
 
-    void Add_Particles(int n) {
+void Add_Particles(int n) {
+        int curr;
         for (int i = 0; i < n; i++) {
             particles.resize(particles.size() + 1);
-            particles.at(particles.size() - 1).mass = 1;
-            particles.at(particles.size() - 1).position = {random(0, 0.2), 0.05, random(0, 0.2)};
-            particles.at(particles.size() - 1).velocity =  {10*particles.at(particles.size() - 1).position[0],
+            curr = particles.size() - 1;
+            particles[curr].mass = 1;
+            particles[curr].position = {random(0, 0.2), 0.05, random(0, 0.2)};
+            particles[curr].velocity =  {10*particles[curr].position[0],
                                                             random(1, 10),
-                                                            10*particles.at(particles.size() - 1).position[2]};
-            particles.at(particles.size() - 1).color = {255, 255, 0};
+                                                            10*particles[curr].position[2]};
+            particles[curr].color = {255, 255, 0};
         }
 
     }
 
-    float random(float k, float l) {
-        return k + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(l - k)));
-    }
-
-
+float random(float k, float l) {
+    return (k + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(l - k))));
 }
