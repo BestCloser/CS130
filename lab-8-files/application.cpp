@@ -333,18 +333,16 @@ void draw_obj(obj *o, const gl_image_texture_map& textures)
 
 
 void Particle::Euler_Step(float h) {
-        for (unsigned i = 0; i < particles.size(); i++) {
-            particles[i].old_position = particles[i].position;
-            particles[i].position = particles[i].position + h * particles[i].velocity;
-            particles[i].velocity = ((particles[i].position - particles[i].old_position) / h) + (h/particles[i].mass) * particles[i].force;
-        }
-    }
+    old_position = position;
+    position = position + h * velocity;
+    velocity = (position - old_position) / h + (h/mass) * force;
+}
+
     
 void Particle::Reset_Forces() {
-    for (unsigned i = 0; i < particles.size(); i++) {
-        particles[i].force = {0, 0, 0};
-    }
+    force = {0, 0, 0};
 }
+
 
 void Particle::Handle_collision(float damping, float coeff_restitution) {
         if (position[1] < 0) { // y value
