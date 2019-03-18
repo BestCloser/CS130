@@ -139,7 +139,7 @@ void application::draw_event()
             particles[i].Euler_Step(0.02);
             particles[i].Handle_collision(0.5, 0.5);
             particles[i].Reset_Forces();
-            particle[i].color = Get_Particle_Color(d);
+            particles[i].color = Get_Particle_Color(particles[i].duration);
         }
 
     }
@@ -334,9 +334,9 @@ void draw_obj(obj *o, const gl_image_texture_map& textures)
 
 void Particle::Euler_Step(float h) {
     old_position = position;
-    position = position + h * velocity;
-    velocity = velocity + (h/mass) * force;
-    d += h;
+    position += h * velocity;
+    velocity += (h/mass) * force;
+    duration += h;
 }
 
     
@@ -393,7 +393,7 @@ vec3 Get_Particle_Color(float d) {
         color = {1 - temp, temp, temp};
     }
     else {
-        return {0.5, 0.5, 0.5};
+        color = {0.5, 0.5, 0.5};
     }
     return color;
 }
