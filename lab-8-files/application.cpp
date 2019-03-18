@@ -377,7 +377,11 @@ float random(float k, float l) {
 
 vec3 Get_Particle_Color(float d) {
     float temp;
-    vec3 color = {1, 0.5, 0};
+    vec3 color;
+    color[0] = 1;
+    color[1] = 0.5;
+    color[2] = 0;
+
     if (d < 0.1) {
         color[1] = 1;
     }
@@ -389,10 +393,13 @@ vec3 Get_Particle_Color(float d) {
     }
     else if (d < 3) {
         temp = (d - 2) * 0.5;
-        color = {1 - temp, temp, temp};
+        color[0] = 1 - temp;
+        color[1] = temp;
+        color[2] = temp;
     }
     else {
-        color = {0.5, 0.5, 0.5};
+        color[0] = 0.5;
+        color[2] = 0.5;
     }
     return color;
 }
