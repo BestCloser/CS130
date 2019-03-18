@@ -333,7 +333,6 @@ void draw_obj(obj *o, const gl_image_texture_map& textures)
 
 
 void Particle::Euler_Step(float h) {
-    old_position = position;
     position += h * velocity;
     velocity += (h/mass) * force;
     duration += h;
@@ -383,7 +382,7 @@ vec3 Get_Particle_Color(float d) {
         color[1] = 1;
     }
     else if (d < 1.5) {
-        color[1] = 1-d/1.5;
+        color[1] = 1 - d/1.5;
     }
     else if (d < 2) {
         color[1] = 0;

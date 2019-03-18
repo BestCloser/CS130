@@ -45,7 +45,6 @@ struct Particle {
     //variables
     float mass; //mass of the particle
     vec3 position; //position of the particle
-    vec3 old_position; //old position
     vec3 velocity; //velocity of the particle
     vec3 force; //force applied on a particle
     vec3 color; //color
