@@ -136,7 +136,7 @@ void application::draw_event()
         Add_Particles(20);
         for (unsigned i = 0; i < particles.size(); i++) {
             particles[i].force[1] = -9.8 * particles[i].mass;
-            particles[i].Euler_Step(0.02);
+            particles[i].Euler_Step(0.01);
             particles[i].Handle_collision(0.5, 0.5);
             particles[i].Reset_Forces();
             particles[i].color = Get_Particle_Color(particles[i].duration);
