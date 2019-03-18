@@ -56,7 +56,6 @@ struct Particle {
     void Euler_Step(float h);
     void Reset_Forces();
     void Handle_collision(float damping, float coeff_restitution);
-    }
 };
 
 
