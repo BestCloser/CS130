@@ -346,10 +346,10 @@ void Particle::Reset_Forces() {
 void Particle::Handle_collision(float damping, float coeff_restitution) {
         if (position[1] < 0) { // y value
             position[1] = 0;
-            velocity[1] = coeff_restitution * velocity[1];
             if (velocity[1] < 0) {
+                velocity[1] = coeff_restitution * velocity[1];
                 velocity[0] = damping * velocity[0];
-                velocity[1] = damping * velocity[1];
+                velocity[2] = damping * velocity[2];
             }
         }
 
