@@ -381,7 +381,7 @@ vec3 Get_Particle_Color(float d) {
     color[0] = 1;
     color[1] = 0.5;
     color[2] = 0;
-3
+
     if (d < 0.1) {
         color[1] = 1;
     }
